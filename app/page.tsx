@@ -2,15 +2,14 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { db } from "../lib/firebase"
 
 export default function Home() {
-  const [isDark, setIsDark] = useState(true)
   const [activeSection, setActiveSection] = useState("")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [blogs, setBlogs] = useState<Array<{ id: string; title?: string; excerpt?: string; date?: string; readTime?: string }>>([])
+  const [loadingBlogs, setLoadingBlogs] = useState(true)
   const sectionsRef = useRef<(HTMLElement | null)[]>([])
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark)
-  }, [isDark])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -32,12 +31,86 @@ export default function Home() {
     return () => observer.disconnect()
   }, [])
 
-  const toggleTheme = () => {
-    setIsDark(!isDark)
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMobileMenuOpen])
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false)
   }
+
+  const formatUrlEllipsis = (href: string) => {
+    try {
+      const u = new URL(href)
+      const display = `${u.host}/…${u.pathname.slice(-14)}`
+      return display
+    } catch {
+      return href
+    }
+  }
+
+  const renderPoint = (text: string) => {
+    const parts = text.split(/(@https?:\/\/\S+)/g)
+    return parts.map((part, i) => {
+      if (part.startsWith('@http')) {
+        const href = part.slice(1)
+        return (
+          <a
+            key={`link-${i}`}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-4 hover:no-underline"
+          >
+            {formatUrlEllipsis(href)}
+          </a>
+        )
+      }
+      return <span key={`text-${i}`}>{part}</span>
+    })
+  }
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        // @ts-ignore - types resolve at runtime; suppress lint in client file
+        const { collection, getDocs, orderBy, query } = await import("firebase/firestore")
+        const blogsRef = collection(db as any, "blogs")
+        const q = query(blogsRef, orderBy("date", "desc"))
+        const snapshot = await getDocs(q)
+        const items = snapshot.docs.map((doc: any) => {
+          const data = doc.data() as any
+          return {
+            id: doc.id,
+            title: data.title ?? "Untitled",
+            excerpt: data.excerpt ?? "",
+            date: data.date ?? "",
+            readTime: data.readTime ?? "",
+          }
+        })
+        setBlogs(items)
+      } catch (error) {
+        console.error("Failed to load blogs:", error)
+        setBlogs([])
+      } finally {
+        setLoadingBlogs(false)
+      }
+    }
+
+    fetchBlogs()
+  }, [])
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
+      {/* Left Side Navigation */}
       <nav className="fixed left-8 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
         <div className="flex flex-col gap-4">
           {["intro", "work", "projects", "education", "connect"].map((section) => (
@@ -53,20 +126,24 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-8 lg:px-16">
-        <div
-          role="navigation"
-          aria-label="Primary"
-          className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border"
-        >
+      {/* Top Navigation Bar */}
+      <div
+        role="navigation"
+        aria-label="Primary"
+        className="fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur border-b border-border"
+      >
+        <div className="max-w-4xl mx-auto px-8 lg:px-16">
           <div className="flex items-center justify-between py-3">
             <div className="text-sm text-muted-foreground font-mono tracking-wider">Harsh Mehta's Portfoli0</div>
-            <ul className="flex items-center gap-6 text-sm">
+            
+            {/* Desktop Navigation */}
+            <ul className="hidden lg:flex items-center gap-6 text-sm">
               {[
                 { label: "Home", id: "intro" },
                 { label: "Experience", id: "work" },
                 { label: "Projects", id: "projects" },
                 { label: "Education", id: "education" },
+                { label: "Blogs", id: "thoughts" },
                 { label: "Contact", id: "connect" },
               ].map((item) => (
                 <li key={item.id}>
@@ -82,9 +159,119 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200"
+              aria-label="Toggle mobile menu"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {isMobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
+      </div>
 
+      {/* Mobile Side Menu */}
+      <div
+        className={`fixed inset-0 z-50 lg:hidden ${
+          isMobileMenuOpen ? 'block' : 'hidden'
+        }`}
+      >
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={closeMobileMenu}
+        />
+        
+        {/* Side Menu */}
+        <div
+          className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-background border-l border-border transform transition-transform duration-300 ease-in-out ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h2 className="text-lg font-medium">Menu</h2>
+              <button
+                onClick={closeMobileMenu}
+                className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200"
+                aria-label="Close mobile menu"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Navigation Items */}
+            <nav className="flex-1 p-6">
+              <ul className="space-y-4">
+                {[
+                  { label: "Home", id: "intro" },
+                  { label: "Experience", id: "work" },
+                  { label: "Projects", id: "projects" },
+                  { label: "Education", id: "education" },
+                  { label: "Blogs", id: "thoughts" },
+                  { label: "Contact", id: "connect" },
+                ].map((item) => (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => {
+                        document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })
+                        closeMobileMenu()
+                      }}
+                      className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
+                        activeSection === item.id
+                          ? "bg-muted-foreground/20 text-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10"
+                      }`}
+                      aria-current={activeSection === item.id ? "page" : undefined}
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-8 lg:px-1 pt-0">
         <header
           id="intro"
           ref={(el) => { sectionsRef.current[0] = el }}
@@ -103,10 +290,9 @@ export default function Home() {
 
               <div className="space-y-6 max-w-md">
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Software engineer crafting digital experiences at the intersection of
-                  <span className="text-foreground"> design</span>,<span className="text-foreground"> technology</span>,
-                  and
-                  <span className="text-foreground"> human behavior</span>.
+                  Software Engineer helping <span className="text-foreground">Change Poor Perception</span> of
+                  <span className="text-foreground"> Public toilets</span> in India,
+                  <span className="text-foreground"> One toilet at a Time</span>.
                 </p>
 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -136,7 +322,7 @@ export default function Home() {
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    Download Resume
+                    Resume
                   </a>
                   <a
                     href="https://github.com/harshmehta15"
@@ -157,6 +343,23 @@ export default function Home() {
                       />
                     </svg>
                     GitHub
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/harshmehta15"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                    aria-label="Open LinkedIn profile"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M4.983 3.5C4.983 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.483 1.12 2.483 2.5zM.3 8.25h4.4V23H.3V8.25zM8.6 8.25h4.215v2.01h.06c.587-1.113 2.02-2.285 4.158-2.285 4.448 0 5.267 2.928 5.267 6.733V23h-4.4v-6.53c0-1.558-.028-3.56-2.17-3.56-2.172 0-2.505 1.697-2.505 3.45V23H8.6V8.25z" />
+                    </svg>
+                    LinkedIn
                   </a>
                   <a
                     href="https://leetcode.com/u/19it056/"
@@ -188,9 +391,18 @@ export default function Home() {
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground font-mono">CURRENTLY</div>
                 <div className="space-y-2">
-                  <div className="text-foreground">SDE</div>
-                  <div className="text-muted-foreground">@ Loocafe</div>
+                  <div className="text-foreground">Software Developer Engineer</div>
+                  <div className="text-muted-foreground">@ <a href="https://www.loocafe.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:no-underline">Loocafe , India</a></div>
                   <div className="text-xs text-muted-foreground">2023 — Present</div>
+                  <button
+                    onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="mt-2 px-3 py-2 text-xs border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
+                  >
+                    View Experience
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
               </div>
 
@@ -215,46 +427,66 @@ export default function Home() {
           <div className="space-y-16">
             <div className="flex items-end justify-between">
               <h2 className="text-4xl font-light">Work Experience</h2>
-              <div className="text-sm text-muted-foreground font-mono">2019 — 2025</div>
+              <div className="text-sm text-muted-foreground font-mono">2023 — Present</div>
             </div>
 
             <div className="space-y-12">
               {[
                 {
-                  year: "2023",
-                  role: "Senior Frontend Engineer",
-                  company: "Vercel",
-                  description: "Leading frontend architecture for developer tools and AI-powered features.",
-                  tech: ["React", "TypeScript", "Next.js"],
+                  year: "Aug 2023",
+                  role: "Software Developer Engineer",
+                  company: "Loocafe , India",
+                  highlights: [
+                    "Delivered Loocafe app from scratch with four interfaces; Play Store deployment of the app improved operational efficiency by 7x and reduced costs",
+                    "Built React dashboard for managers and vertical heads with analytics for monitoring and decision-making",
+                    "Loocafe app Play Store link: @https://play.google.com/store/apps/details?id=com.loocafe.toiletfinder",
+                    "Developed Ixora Feedback App with GHMC and Hyderabad & Cyberabad Police; enabled live feedback at public sites (Charminar, Goshamahal, Secunderabad, Karwan, Santosh Nagar, etc.)",
+                    "Created companion React dashboard to manage and analyze feedback data ",
+                    "Feedback app Play Store link: @https://play.google.com/store/apps/details?id=com.ixoragroup.feedbackapp",
+                    "Built Ixora Growth Points to track employee productivity and run a loyalty/reward program for 2,000+ employees across all branches of the company . Ixora Growth Points link: @https://ixoragrowthpoints.vercel.app/dashboard",
+                    
+                    
+                    
+                  ],
+                  tech: ["Flutter", "Nextjs", "Firebase", "GCP"],
+                  website: "https://www.loocafe.com/",
+                  linkedin: "https://www.linkedin.com/company/loocafe",
                 },
                 {
-                  year: "2022",
-                  role: "Frontend Engineer",
-                  company: "Linear",
-                  description: "Built performant interfaces for project management and team collaboration.",
-                  tech: ["React", "GraphQL", "Framer Motion"],
+                  year: "Feb - Aug 2023",
+                  role: "Flutter Developer - Intern",
+                  company: "Wrench USA Pvt Ltd , Bangalore",
+                  highlights: [
+                    "Implemented dynamic tooltips to enhance Maestro Studio detection and QA workflows",
+                    "Developed AWS token generator to issue and manage ID/auth/refresh tokens for app consumers",
+                    "Enhanced UI components and responsiveness; resolved cross-platform issues",
+                    "Collaborated with QA to fix critical bugs; reduced testing time by 3x",
+                  ],
+                  tech: ["Flutter", "AWS","Firebase","Dart", "Github"],
+                  website: "https://wrench.com/",
+                  linkedin: "https://www.linkedin.com/company/wrench-inc./",
                 },
                 {
-                  year: "2021",
-                  role: "Full Stack Developer",
-                  company: "Stripe",
-                  description: "Developed payment infrastructure and merchant-facing dashboard features.",
-                  tech: ["Ruby", "React", "PostgreSQL"],
+                  year: "June - July 2022",
+                  role: "Summer Intern",
+                  company: "TatvaSoft , Ahmedabad",
+                  highlights: [
+                    "Built a full-stack bookstore web app using React, .NET API, and PostgreSQL",
+                    "Implemented authentication, catalog management, and cart functionality",
+                    "Ensured robust client–server integration and data flow",
+                  ],
+                  tech: [".Net", "Postgres", "ReactJs"],
+                  website: "https://www.tatvasoft.com/",
+                  linkedin: "https://www.linkedin.com/company/tatvasoft/",
                 },
-                {
-                  year: "2019",
-                  role: "Software Engineer",
-                  company: "Airbnb",
-                  description: "Created booking flow optimizations and host management tools.",
-                  tech: ["React", "Node.js", "MySQL"],
-                },
+              
               ].map((job, index) => (
                 <div
                   key={index}
                   className="group grid lg:grid-cols-12 gap-8 py-8 border-b border-border/50 hover:border-border transition-colors duration-500"
                 >
                   <div className="lg:col-span-2">
-                    <div className="text-2xl font-light text-muted-foreground group-hover:text-foreground transition-colors duration-500">
+                    <div className="text-l font-light text-muted-foreground group-hover:text-foreground transition-colors duration-500">
                       {job.year}
                     </div>
                   </div>
@@ -262,9 +494,48 @@ export default function Home() {
                   <div className="lg:col-span-6 space-y-3">
                     <div>
                       <h3 className="text-xl font-medium">{job.role}</h3>
-                      <div className="text-muted-foreground">{job.company}</div>
+                      <div className="text-muted-foreground flex items-center gap-3 mt-2">
+                        <span>{job.company}</span>
+                        {(job as any).website && (
+                          <a
+                            href={(job as any).website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex p-1.5 rounded-md border border-border hover:border-muted-foreground/60 transition-colors"
+                            aria-label="Company website"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                              <circle cx="12" cy="12" r="9" strokeWidth="2" />
+                              <path d="M3 12h18" strokeWidth="2" />
+                              <path d="M12 3c3 3 3 15 0 18" strokeWidth="2" />
+                              <path d="M12 3c-3 3-3 15 0 18" strokeWidth="2" />
+                            </svg>
+                          </a>
+                        )}
+                        {(job as any).linkedin && (
+                          <a
+                            href={(job as any).linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex p-1.5 rounded-md border border-border hover:border-muted-foreground/60 transition-colors"
+                            aria-label="Company LinkedIn"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                              <path d="M4.983 3.5C4.983 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.483 1.12 2.483 2.5zM.3 8.25h4.4V23H.3V8.25zM8.6 8.25h4.215v2.01h.06c.587-1.113 2.02-2.285 4.158-2.285 4.448 0 5.267 2.928 5.267 6.733V23h-4.4v-6.53c0-1.558-.028-3.56-2.17-3.56-2.172 0-2.505 1.697-2.505 3.45V23H8.6V8.25z" />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-muted-foreground leading-relaxed max-w-lg">{job.description}</p>
+                    {Array.isArray((job as any).highlights) ? (
+                      <ul className="list-disc pl-5 text-muted-foreground leading-relaxed space-y-2 max-w-lg">
+                        {(job as any).highlights.map((point: string, i: number) => (
+                          <li key={i}>{renderPoint(point)}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground leading-relaxed max-w-lg">{(job as any).description}</p>
+                    )}
                   </div>
 
                   <div className="lg:col-span-4 flex flex-wrap gap-2 lg:justify-end">
@@ -285,47 +556,136 @@ export default function Home() {
 
         <section
           id="projects"
-                            ref={(el) => { sectionsRef.current[2] = el }}
-          className="min-h-screen py-32 opacity-0 scroll-mt-24"
+          ref={(el) => { sectionsRef.current[2] = el }}
+          className="min-h-screen py-10 opacity-0 scroll-mt-24"
         >
-          <div className="space-y-16">
-            <h2 className="text-4xl font-light">Projects</h2>
+          <div className="space-y-12">
+            <div className="flex items-end justify-between">
+              <h2 className="text-4xl font-light">Projects & Contributions</h2>
+              <div className="flex items-center gap-4">
+                <div className="text-sm text-muted-foreground font-mono">2022 - Present</div>
+                <Link
+                  href="/projects"
+                  className="px-3 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
+                >
+                  View all projects
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
             <div className="grid lg:grid-cols-2 gap-8">
               {[
                 {
-                  title: "Project One",
-                  description: "Brief summary of what this project does and your impact. Link to code or demo.",
-                  tech: ["Next.js", "React", "Firebase"],
-                  href: "#",
+                  title: "Jungle.Baby - Kids Activity Booking Platform",
+                  description: (
+                    <>
+                      Built for a <span className="text-foreground">fully funded startup in Singapore</span>. End-to-end platform for <span className="text-foreground">discovering and booking kids' activities</span> with <span className="text-foreground">web and mobile apps</span>.
+                    </>
+                  ),
+                  tech: ["Next.js", 'Algolia',"Posthog", "Flutter", "Firebase", "Postman", "Vercel", "PostgreSQL", "Node.js"],
+                  more: "#",
+                  live: "https://www.jungle.baby/",
+                  contribution: true,
                 },
                 {
-                  title: "Project Two",
-                  description: "Brief summary of the project with measurable outcomes or interesting technical detail.",
-                  tech: ["Flutter", "Supabase", "GCP"],
-                  href: "#",
+                  title: "Jungle Data Editors - Blog & Camp",
+                  description: (
+                    <>
+                      Built in-house data editors powering Jungle.baby: <span className="text-foreground">Blog Editor</span> and <span className="text-foreground">Camp Editor</span> with <span className="text-foreground">real-time updates</span>, <span className="text-foreground">bulk uploads</span>, <span className="text-foreground">email automations</span>, and <span className="text-foreground">backend content workflows</span>.
+                    </>
+                  ),
+                  tech: ["React", "Firestore", "Google Cloud Storage", "REST APIs", "Automations"],
+                  more: "#",
+                  live: "",
+                  contribution: true,
+                  internal: true,
                 },
-              ].map((proj) => (
-                <a
-                  key={proj.title}
-                  href={proj.href}
-                  className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300 hover:shadow-sm"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                {
+                  title: "Sequester Green Brigade",
+                  description: (
+                    <>
+                      Mobile application developed for an associate of <span className="text-foreground">Council on Energy, Environment and Water (CEEW)</span> and <span className="text-foreground">Sequester Environmental Services</span>. Enables citizens to capture photos of unhygienic neighbourhoods and routes them for same‑day cleaning.
+                    </>
+                  ),
+                  tech: ["Flutter", "Figma", "Firebase"],
+                  more: "#",
+                  live: "",
+                  internal: true,
+                },
+                {
+                  title: "Jewellery Inventory System",
+                  description: (
+                    <>
+                      Internal inventory management software jewellery shops. Staff record jewellery <span className="text-foreground">weights before/after services, sales and purchases</span>; supports <span className="text-foreground">polishing</span> and other <span className="text-foreground">gold servicing workflows</span>. Later handed over to a <span className="text-foreground">jewellery shop in Mumbai - Sohan Enterprises</span>.
+                    </>
+                  ),
+                  tech: ["Flutter", "Firebase"],
+                  more: "#",
+                  live: "",
+                  internal: true,
+                },
+              ].map((project, index) => (
+                <article
+                  key={index}
+                  className="group p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg cursor-pointer"
                 >
-                  <div className="space-y-3">
-                    <h3 className="text-xl font-medium group-hover:text-muted-foreground transition-colors">
-                      {proj.title}
+                  <div className="space-y-4">
+                    {((project as any).contribution) && (
+                      <div className="inline-flex items-center gap-2 px-2.5 py-1 text-[11px] uppercase tracking-wide rounded-full border border-border text-muted-foreground">
+                        <span className="w-1.5 h-1.5 rounded-full bg-foreground"></span>
+                        Contribution
+                      </div>
+                    )}
+                    <h3 className="text-xl font-medium">
+                      {project.title}
                     </h3>
-                    <p className="text-muted-foreground leading-relaxed">{proj.description}</p>
+
+                    <p className="text-muted-foreground leading-relaxed">{project.description}</p>
+
                     <div className="flex flex-wrap gap-2">
-                      {proj.tech.map((t) => (
-                        <span key={t} className="px-2 py-1 text-xs text-muted-foreground rounded">
-                          {t}
+                      {project.tech.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-1 text-xs text-muted-foreground rounded group-hover:border-muted-foreground/50 transition-colors duration-500"
+                        >
+                          {tech}
                         </span>
                       ))}
                     </div>
+
+                    <div className="flex items-center gap-3 text-sm">
+                      <a
+                        href={project.more}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
+                      >
+                        View more
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </a>
+                      {(project as any).internal ? (
+                        <></>
+                      ) : (
+                        <a
+                          href={project.live}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-2 border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
+                        >
+                          View live URL
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 3h7v7M21 3l-9 9" />
+                      </svg>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </a>
+                </article>
               ))}
             </div>
           </div>
@@ -333,8 +693,8 @@ export default function Home() {
 
         <section
           id="education"
-                            ref={(el) => { sectionsRef.current[3] = el }}
-          className="min-h-screen py-32 opacity-0 scroll-mt-24"
+          ref={(el) => { sectionsRef.current[3] = el }}
+          className="min-h-screen pt-23 pb-10 opacity-0 scroll-mt-24"
         >
           <div className="space-y-12">
             <h2 className="text-4xl font-light">Education and Certifications</h2>
@@ -353,28 +713,16 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-6">
               {[
                 {
-                  name: "AWS Certified Cloud Practitioner",
-                  issuer: "Amazon Web Services",
+                  name: "100x Devs Certified (Cohort 2)",
+                  issuer: "100x Devs",
                   date: "2024",
-                  description: "Foundational cloud computing concepts and AWS services"
+                  description: "Full‑stack JS/TS: Node.js, Express, DBs, auth, APIs, Next.js, frontend patterns, Docker/DevOps; advanced backend & systems: queues, Redis/Kafka, design patterns, scalability, observability, Kubernetes, CI/CD; built real‑world projects."
                 },
                 {
                   name: "Google Cloud Platform Fundamentals",
                   issuer: "Google Cloud",
                   date: "2024",
-                  description: "Core infrastructure and services on Google Cloud Platform"
-                },
-                {
-                  name: "Microsoft Azure Fundamentals",
-                  issuer: "Microsoft",
-                  date: "2023",
-                  description: "Cloud concepts and Azure services fundamentals"
-                },
-                {
-                  name: "React Developer Certification",
-                  issuer: "Meta",
-                  date: "2023",
-                  description: "Advanced React development and best practices"
+                  description: "Core GCP services and architecture: IAM, Cloud Storage, Cloud Run, App Engine, Cloud Functions, Pub/Sub, Cloud SQL/Firestore, load balancing, monitoring with Cloud Logging/Monitoring."
                 }
               ].map((cert, index) => (
                 <div key={index} className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300">
@@ -416,35 +764,15 @@ export default function Home() {
           <div className="space-y-16">
             <h2 className="text-4xl font-light">Recent Thoughts</h2>
 
+            {loadingBlogs ? (
+              <div className="text-muted-foreground">Loading blogs...</div>
+            ) : blogs.length === 0 ? (
+              <div className="text-muted-foreground">0 blogs posted uptill now.</div>
+            ) : (
             <div className="grid lg:grid-cols-2 gap-8">
-              {[
-                {
-                  title: "The Future of Web Development",
-                  excerpt: "Exploring how AI and automation are reshaping the way we build for the web.",
-                  date: "Dec 2024",
-                  readTime: "5 min",
-                },
-                {
-                  title: "Design Systems at Scale",
-                  excerpt: "Lessons learned from building and maintaining design systems across multiple products.",
-                  date: "Nov 2024",
-                  readTime: "8 min",
-                },
-                {
-                  title: "Performance-First Development",
-                  excerpt: "Why performance should be a first-class citizen in your development workflow.",
-                  date: "Oct 2024",
-                  readTime: "6 min",
-                },
-                {
-                  title: "The Art of Code Review",
-                  excerpt: "Building better software through thoughtful and constructive code reviews.",
-                  date: "Sep 2024",
-                  readTime: "4 min",
-                },
-              ].map((post, index) => (
+                {blogs.map((post) => (
                 <article
-                  key={index}
+                    key={post.id}
                   className="group p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg cursor-pointer"
                 >
                   <div className="space-y-4">
@@ -479,6 +807,7 @@ export default function Home() {
                 </article>
               ))}
             </div>
+            )}
           </div>
         </section>
 
@@ -515,12 +844,12 @@ export default function Home() {
               <div className="text-sm text-muted-foreground font-mono">ELSEWHERE</div>
 
               <div className="grid grid-cols-2 gap-4">
-                                  {[
-                    { name: "GitHub", handle: "@harshmehta15", url: "https://github.com/harshmehta15" },
-                    { name: "Twitter", handle: "@jordanchen", url: "#" },
-                    { name: "LinkedIn", handle: "@harshmehta15", url: "https://www.linkedin.com/in/harshmehta15" },
-                    { name: "LeetCode", handle: "@19it056", url: "https://leetcode.com/u/19it056/" },
-                  ].map((social) => (
+                {[
+                  { name: "GitHub", handle: "@harshmehta15", url: "https://github.com/harshmehta15" },
+                  { name: "Twitter", handle: "@jordanchen", url: "#" },
+                  { name: "LinkedIn", handle: "@harshmehta15", url: "https://www.linkedin.com/in/harshmehta15" },
+                  { name: "LeetCode", handle: "@19it056", url: "https://leetcode.com/u/19it056/" },
+                ].map((social) => (
                   <Link
                     key={social.name}
                     href={social.url}
@@ -543,12 +872,9 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">© 2025 Harsh Mehta. All rights reserved.</div>
-              
             </div>
 
             <div className="flex items-center gap-4">
-              
-
               <button className="group p-3 rounded-lg border border-border hover:border-muted-foreground/50 transition-all duration-300">
                 <svg
                   className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-300"
