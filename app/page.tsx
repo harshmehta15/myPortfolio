@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { useTheme } from "next-themes"
 import { db } from "../lib/firebase"
 
 export default function Home() {
@@ -10,6 +11,12 @@ export default function Home() {
   const [blogs, setBlogs] = useState<Array<{ id: string; title?: string; excerpt?: string; date?: string; readTime?: string }>>([])
   const [loadingBlogs, setLoadingBlogs] = useState(true)
   const sectionsRef = useRef<(HTMLElement | null)[]>([])
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -137,28 +144,58 @@ export default function Home() {
             <div className="text-sm text-muted-foreground font-mono tracking-wider">Harsh Mehta's Portfoli0</div>
             
             {/* Desktop Navigation */}
-            <ul className="hidden lg:flex items-center gap-6 text-sm">
-              {[
-                { label: "Home", id: "intro" },
-                { label: "Experience", id: "work" },
-                { label: "Projects", id: "projects" },
-                { label: "Education", id: "education" },
-                { label: "Blogs", id: "thoughts" },
-                { label: "Contact", id: "connect" },
-              ].map((item) => (
-                <li key={item.id}>
-                  <button
-                    onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })}
-                    className={`transition-colors ${
-                      activeSection === item.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    aria-current={activeSection === item.id ? "page" : undefined}
-                  >
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <div className="hidden lg:flex items-center gap-6">
+              <ul className="flex items-center gap-6 text-sm">
+                {[
+                  { label: "Home", id: "intro" },
+                  { label: "Experience", id: "work" },
+                  { label: "Projects", id: "projects" },
+                  { label: "Education", id: "education" },
+                  { label: "Contact", id: "connect" },
+                ].map((item) => (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })}
+                      className={`transition-colors ${
+                        activeSection === item.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      aria-current={activeSection === item.id ? "page" : undefined}
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              
+              {/* Theme Toggle */}
+              {mounted && (
+                <button
+                  onClick={() => {
+                    if (theme === "system") {
+                      // If system is dark, switch to light; if system is light, switch to dark
+                      const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+                      setTheme(systemIsDark ? "light" : "dark")
+                    } else if (theme === "light") {
+                      setTheme("dark")
+                    } else {
+                      setTheme("light")
+                    }
+                  }}
+                  className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200"
+                  aria-label="Toggle theme"
+                >
+                  {theme === "dark" ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                  )}
+                </button>
+              )}
+            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -244,7 +281,6 @@ export default function Home() {
                   { label: "Experience", id: "work" },
                   { label: "Projects", id: "projects" },
                   { label: "Education", id: "education" },
-                  { label: "Blogs", id: "thoughts" },
                   { label: "Contact", id: "connect" },
                 ].map((item) => (
                   <li key={item.id}>
@@ -265,6 +301,42 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
+              
+              {/* Mobile Theme Toggle */}
+              {mounted && (
+                <div className="mt-6 pt-6 border-t border-border">
+                  <button
+                    onClick={() => {
+                      if (theme === "system") {
+                        // If system is dark, switch to light; if system is light, switch to dark
+                        const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+                        setTheme(systemIsDark ? "light" : "dark")
+                      } else if (theme === "light") {
+                        setTheme("dark")
+                      } else {
+                        setTheme("light")
+                      }
+                    }}
+                    className="w-full text-left p-3 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 flex items-center gap-3"
+                  >
+                    {theme === "dark" ? (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Light Mode
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        Dark Mode
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </nav>
           </div>
         </div>
@@ -305,8 +377,9 @@ export default function Home() {
 
                 <div className="flex items-center gap-4">
                   <a
-                    href="/resume.pdf"
-                    download
+                    href="https://docs.google.com/document/d/1SRGcODzKLN8_fbaXtBcRrmjV78lLNzeVoo8_v8gPkKc/edit?usp=sharing"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
                   >
                     <svg
@@ -461,6 +534,7 @@ export default function Home() {
                     "Developed AWS token generator to issue and manage ID/auth/refresh tokens for app consumers",
                     "Enhanced UI components and responsiveness; resolved cross-platform issues",
                     "Collaborated with QA to fix critical bugs; reduced testing time by 3x",
+                    "Wrench mobile app App Store link: @https://apps.apple.com/us/app/wrench-mobile-car-mechanics/id1138373180",
                   ],
                   tech: ["Flutter", "AWS","Firebase","Dart", "Github"],
                   website: "https://wrench.com/",
@@ -478,6 +552,7 @@ export default function Home() {
                   tech: [".Net", "Postgres", "ReactJs"],
                   website: "https://www.tatvasoft.com/",
                   linkedin: "https://www.linkedin.com/company/tatvasoft/",
+                  document: "/experience/TatvaSoftExperience.pdf",
                 },
               
               ].map((job, index) => (
@@ -525,6 +600,17 @@ export default function Home() {
                             </svg>
                           </a>
                         )}
+                        {(job as any).document && (
+                          <button
+                            onClick={() => window.open((job as any).document, '_blank')}
+                            className="inline-flex p-1.5 rounded-md border border-border hover:border-muted-foreground/60 transition-colors"
+                            aria-label="View experience document"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     </div>
                     {Array.isArray((job as any).highlights) ? (
@@ -563,7 +649,7 @@ export default function Home() {
             <div className="flex items-end justify-between">
               <h2 className="text-4xl font-light">Projects & Contributions</h2>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-muted-foreground font-mono">2022 - Present</div>
+                
                 <Link
                   href="/projects"
                   className="px-3 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
@@ -700,7 +786,28 @@ export default function Home() {
             <h2 className="text-4xl font-light">Education and Certifications</h2>
             <div className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300">
               <div className="flex flex-col gap-1">
-                <div className="text-lg">Bachelor of Engineering in Information Technology</div>
+                <div className="flex items-center justify-between">
+                  <div className="text-lg">Bachelor of Engineering in Information Technology</div>
+                  <button
+                    onClick={() => window.open('/certifications/GTU_Degree.jpg', '_blank')}
+                    className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200 group-hover:bg-muted-foreground/20"
+                    aria-label="View degree certificate"
+                  >
+                    <svg
+                      className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors duration-200"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </button>
+                </div>
                 <div className="text-sm text-muted-foreground">Gujarat Technological University (GTU)</div>
               </div>
               <p className="mt-3 text-muted-foreground leading-relaxed">
@@ -730,7 +837,13 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       <div className="text-lg font-medium">{cert.name}</div>
                       <button 
-                        onClick={() => window.open(`/certificates/${cert.name.toLowerCase().replace(/\s+/g, '-')}.pdf`, '_blank')}
+                        onClick={() => {
+                          if (cert.name === "100x Devs Certified (Cohort 2)") {
+                            window.open('/certifications/100xdevs.png', '_blank')
+                          } else {
+                            window.open(`/certificates/${cert.name.toLowerCase().replace(/\s+/g, '-')}.pdf`, '_blank')
+                          }
+                        }}
                         className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200 group-hover:bg-muted-foreground/20"
                         aria-label={`View ${cert.name} certificate`}
                       >
@@ -760,58 +873,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="thoughts" ref={(el) => { sectionsRef.current[4] = el }} className="min-h-screen py-32 opacity-0">
-          <div className="space-y-16">
-            <h2 className="text-4xl font-light">Recent Thoughts</h2>
 
-            {loadingBlogs ? (
-              <div className="text-muted-foreground">Loading blogs...</div>
-            ) : blogs.length === 0 ? (
-              <div className="text-muted-foreground">0 blogs posted uptill now.</div>
-            ) : (
-            <div className="grid lg:grid-cols-2 gap-8">
-                {blogs.map((post) => (
-                <article
-                    key={post.id}
-                  className="group p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg cursor-pointer"
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
-                      <span>{post.date}</span>
-                      <span>{post.readTime}</span>
-                    </div>
 
-                    <h3 className="text-xl font-medium group-hover:text-muted-foreground transition-colors duration-300">
-                      {post.title}
-                    </h3>
-
-                    <p className="text-muted-foreground leading-relaxed">{post.excerpt}</p>
-
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                      <span>Read more</span>
-                      <svg
-                        className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-            )}
-          </div>
-        </section>
-
-        <section id="connect" ref={(el) => { sectionsRef.current[5] = el }} className="py-32 opacity-0">
+        <section id="connect" ref={(el) => { sectionsRef.current[4] = el }} className="py-32 opacity-0">
           <div className="grid lg:grid-cols-2 gap-16">
             <div className="space-y-8">
               <h2 className="text-4xl font-light">Let's Connect</h2>
@@ -846,13 +910,17 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { name: "GitHub", handle: "@harshmehta15", url: "https://github.com/harshmehta15" },
-                  { name: "Twitter", handle: "@jordanchen", url: "#" },
+                  { name: "X (formerly Twitter)", handle: "@harshmofficial", url: "https://x.com/harshmofficial" },
                   { name: "LinkedIn", handle: "@harshmehta15", url: "https://www.linkedin.com/in/harshmehta15" },
                   { name: "LeetCode", handle: "@19it056", url: "https://leetcode.com/u/19it056/" },
+                  { name: "Discord", handle: "@harsh.mehta", url: "https://discord.com/users/harsh.mehta" },
+                  { name: "Telegram", handle: "@harshmehta15", url: "https://t.me/harshmehta15" },
                 ].map((social) => (
                   <Link
                     key={social.name}
                     href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="group p-4 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300 hover:shadow-sm"
                   >
                     <div className="space-y-2">
@@ -874,23 +942,7 @@ export default function Home() {
               <div className="text-sm text-muted-foreground">© 2025 Harsh Mehta. All rights reserved.</div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <button className="group p-3 rounded-lg border border-border hover:border-muted-foreground/50 transition-all duration-300">
-                <svg
-                  className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-              </button>
-            </div>
+
           </div>
         </footer>
       </main>
