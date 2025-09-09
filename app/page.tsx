@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { useTheme } from "next-themes"
-import { db } from "../lib/firebase"
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("")
@@ -85,34 +84,10 @@ export default function Home() {
     })
   }
 
+  // No backend: stop fetching blogs from Firebase
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        // @ts-ignore - types resolve at runtime; suppress lint in client file
-        const { collection, getDocs, orderBy, query } = await import("firebase/firestore")
-        const blogsRef = collection(db as any, "blogs")
-        const q = query(blogsRef, orderBy("date", "desc"))
-        const snapshot = await getDocs(q)
-        const items = snapshot.docs.map((doc: any) => {
-          const data = doc.data() as any
-          return {
-            id: doc.id,
-            title: data.title ?? "Untitled",
-            excerpt: data.excerpt ?? "",
-            date: data.date ?? "",
-            readTime: data.readTime ?? "",
-          }
-        })
-        setBlogs(items)
-      } catch (error) {
-        console.error("Failed to load blogs:", error)
-        setBlogs([])
-      } finally {
-        setLoadingBlogs(false)
-      }
-    }
-
-    fetchBlogs()
+    setBlogs([])
+    setLoadingBlogs(false)
   }, [])
 
   return (
