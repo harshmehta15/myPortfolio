@@ -27,7 +27,10 @@ export default function Home() {
           }
         })
       },
-      { threshold: 0.3, rootMargin: "0px 0px -20% 0px" },
+      // Use a lower threshold and smaller negative bottom margin so sections
+      // reliably trigger on shorter mobile viewports as soon as they begin to
+      // enter the screen.
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" },
     )
 
     sectionsRef.current.forEach((section) => {
