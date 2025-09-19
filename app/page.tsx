@@ -442,7 +442,7 @@ export default function Home() {
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground font-mono">CURRENTLY</div>
                 <div className="space-y-2">
-                  <div className="text-foreground">Software Developer Engineer</div>
+                  <div className="text-foreground">Software Development Engineer</div>
                   <div className="text-muted-foreground">@ <a href="https://www.loocafe.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:no-underline">Loocafe , India</a></div>
                   <div className="text-xs text-muted-foreground">2023 — Present</div>
                   <button
@@ -485,7 +485,7 @@ export default function Home() {
               {[
                 {
                   year: "Aug 2023",
-                  role: "Software Developer Engineer",
+                  role: "Software Development Engineer",
                   company: "Loocafe , India",
                   highlights: [
                     "Delivered Loocafe app from scratch with four interfaces; Play Store deployment of the app improved operational efficiency by 7x and reduced costs",
