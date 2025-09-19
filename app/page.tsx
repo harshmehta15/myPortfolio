@@ -476,9 +476,9 @@ export default function Home() {
 
         <section id="work" ref={(el) => { sectionsRef.current[1] = el }} className="min-h-screen py-32 opacity-0">
           <div className="space-y-16">
-            <div className="flex items-end justify-between">
-              <h2 className="text-4xl font-light">Work Experience</h2>
-              <div className="text-sm text-muted-foreground font-mono">2023 — Present</div>
+            <div className="flex flex-col items-center gap-2 lg:flex-row lg:items-end lg:justify-between">
+              <h2 className="text-4xl font-light flex-1 text-center lg:flex-none lg:text-left">Work Experience</h2>
+              <div className="text-sm text-muted-foreground font-mono lg:text-right">2023 — Present</div>
             </div>
 
             <div className="space-y-12">
@@ -533,21 +533,21 @@ export default function Home() {
                   document: "/experience/TatvaSoftExperience.pdf",
                 },
               
-              ].map((job, index) => (
-                <div
-                  key={index}
-                  className="group grid lg:grid-cols-12 gap-8 py-8 border-b border-border/50 hover:border-border transition-colors duration-500"
-                >
+              ].map((job, index, arr) => (
+                <div key={index}>
+                  <div
+                    className="group grid lg:grid-cols-12 gap-3 lg:gap-8 py-2 lg:py-8 mb-6 lg:mb-0 border-b border-border/50 hover:border-border transition-colors duration-500"
+                  >
                   <div className="lg:col-span-2">
-                    <div className="text-l font-light text-muted-foreground group-hover:text-foreground transition-colors duration-500">
+                    <div className="text-l font-light text-muted-foreground group-hover:text-foreground transition-colors duration-500 text-center lg:text-left">
                       {job.year}
                     </div>
                   </div>
 
                   <div className="lg:col-span-6 space-y-3">
                     <div>
-                      <h3 className="text-xl font-medium">{job.role}</h3>
-                      <div className="text-muted-foreground flex items-center gap-3 mt-2">
+                      <h3 className="text-xl font-medium text-center lg:text-left">{job.role}</h3>
+                      <div className="text-muted-foreground flex items-center gap-3 mt-2 justify-center lg:justify-start">
                         <span>{job.company}</span>
                         {(job as any).website && (
                           <a
@@ -591,6 +591,17 @@ export default function Home() {
                         )}
                       </div>
                     </div>
+                  {/* Tech tags under title on mobile */}
+                  <div className="flex flex-wrap items-start gap-4 pt-1 mb-3 lg:hidden justify-center">
+                    {job.tech.map((tech) => (
+                      <span
+                        key={tech}
+                        className="inline-flex items-center text-xs text-foreground whitespace-nowrap underline underline-offset-4 decoration-foreground/40"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
                     {Array.isArray((job as any).highlights) ? (
                       <ul className="list-disc pl-5 text-muted-foreground leading-relaxed space-y-2 max-w-lg">
                         {(job as any).highlights.map((point: string, i: number) => (
@@ -602,16 +613,19 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="lg:col-span-4 flex flex-wrap gap-2 lg:justify-end">
+                  <div className="lg:col-span-4 hidden lg:flex flex-wrap items-start gap-4 pt-2 lg:pt-0 lg:justify-end">
                     {job.tech.map((tech) => (
                       <span
                         key={tech}
-                        className="px-2 py-1 text-xs text-muted-foreground rounded group-hover:border-muted-foreground/50 transition-colors duration-500"
+                        className="inline-flex items-center text-xs text-foreground whitespace-nowrap underline underline-offset-4 decoration-foreground/40"
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
+                  {/* Close grid container before rendering the mobile separator */}
+                  </div>
+                  {/* Mobile-only separator removed as per request */}
                 </div>
               ))}
             </div>
