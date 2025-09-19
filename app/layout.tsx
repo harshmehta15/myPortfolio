@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "next-themes"
 import "./globals.css"
@@ -39,6 +39,13 @@ export const metadata: Metadata = {
       "Software Engineer helping Change Poor Perception of Public toilets in India, One toilet at a Time.",
     images: ["/ogimg.JPG"],
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({

@@ -116,8 +116,24 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
+  html, body {
     @apply bg-background text-foreground;
+    /* Prevent horizontal overflow on small screens */
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  /* Ensure all containers respect viewport width */
+  .max-w-4xl {
+    max-width: min(56rem, 100vw);
+  }
+  
+  /* Extra responsive text sizing for very small screens */
+  @media (max-width: 375px) {
+    .text-3xl {
+      font-size: 1.75rem !important;
+      line-height: 1.1 !important;
+    }
   }
 }
 

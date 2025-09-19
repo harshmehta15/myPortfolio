@@ -620,8 +620,8 @@ export default function Home() {
           ref={(el) => { sectionsRef.current[2] = el }}
           className="min-h-screen py-10 opacity-0 scroll-mt-24"
         >
-          <div className="space-y-12">
-            <div className="flex items-end justify-between">
+          <div className="space-y-12 text-center lg:text-left">
+            <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-end lg:justify-between">
               <h2 className="text-4xl font-light">Projects & Contributions</h2>
               <div className="flex items-center gap-4">
                 
@@ -691,7 +691,7 @@ export default function Home() {
               ].map((project, index) => (
                 <article
                   key={index}
-                  className="group p-8 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg cursor-pointer"
+                  className="group p-8 border border-muted-foreground/40 lg:border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-500 hover:shadow-lg cursor-pointer"
                 >
                   <div className="space-y-4">
                     {((project as any).contribution) && (
@@ -706,18 +706,18 @@ export default function Home() {
 
                     <p className="text-muted-foreground leading-relaxed">{project.description}</p>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
                       {project.tech.map((tech) => (
                         <span
                           key={tech}
-                          className="px-2 py-1 text-xs text-muted-foreground rounded group-hover:border-muted-foreground/50 transition-colors duration-500"
+                          className="px-2 py-1 text-xs text-muted-foreground rounded group-hover:border-muted-foreground/50 transition-colors duration-500 underline underline-offset-4"
                         >
                           {tech}
                         </span>
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-3 text-sm">
+                    <div className={`flex items-center gap-3 text-sm w-full ${((project as any).internal) ? 'justify-center lg:justify-start' : ''}`}>
                       <a
                         href={project.more}
                         target="_blank"
@@ -757,15 +757,15 @@ export default function Home() {
           ref={(el) => { sectionsRef.current[3] = el }}
           className="min-h-screen pt-23 pb-10 opacity-0 scroll-mt-24"
         >
-          <div className="space-y-12">
+          <div className="space-y-12 text-center lg:text-left">
             <h2 className="text-4xl font-light">Education and Certifications</h2>
-            <div className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300">
+            <div className="group p-6 border border-muted-foreground/40 lg:border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300">
               <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col items-center gap-2 lg:flex-row lg:justify-between">
                   <div className="text-lg">Bachelor of Engineering in Information Technology</div>
                   <button
                     onClick={() => window.open('/certifications/GTU_Degree.jpg', '_blank')}
-                    className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200 group-hover:bg-muted-foreground/20"
+                    className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200 group-hover:bg-muted-foreground/20 inline-flex items-center"
                     aria-label="View degree certificate"
                   >
                     <svg
@@ -781,6 +781,7 @@ export default function Home() {
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
+                    <span className="ml-2 underline underline-offset-4 text-sm text-muted-foreground lg:hidden">View Document</span>
                   </button>
                 </div>
                 <div className="text-sm text-muted-foreground">Gujarat Technological University (GTU)</div>
@@ -792,7 +793,7 @@ export default function Home() {
 
             <div className="border-t border-muted-foreground/20 mb-8"></div>
 
-            <div className="grid lg:grid-cols-2 gap-6">
+              <div className="grid lg:grid-cols-2 gap-6">
               {[
                 {
                   name: "100x Devs Certified (Cohort 2)",
@@ -807,9 +808,9 @@ export default function Home() {
                   description: "Core GCP services and architecture: IAM, Cloud Storage, Cloud Run, App Engine, Cloud Functions, Pub/Sub, Cloud SQL/Firestore, load balancing, monitoring with Cloud Logging/Monitoring."
                 }
               ].map((cert, index) => (
-                <div key={index} className="group p-6 border border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300">
+                <div key={index} className="group p-6 border border-muted-foreground/40 lg:border-border rounded-lg hover:border-muted-foreground/50 transition-all duration-300">
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col items-center gap-2 lg:flex-row lg:justify-between">
                       <div className="text-lg font-medium">{cert.name}</div>
                       <button 
                         onClick={() => {
@@ -819,7 +820,7 @@ export default function Home() {
                             window.open(`/certificates/${cert.name.toLowerCase().replace(/\s+/g, '-')}.pdf`, '_blank')
                           }
                         }}
-                        className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200 group-hover:bg-muted-foreground/20"
+                        className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200 group-hover:bg-muted-foreground/20 inline-flex items-center"
                         aria-label={`View ${cert.name} certificate`}
                       >
                         <svg
@@ -835,6 +836,7 @@ export default function Home() {
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                           />
                         </svg>
+                        <span className="ml-2 underline underline-offset-4 text-sm text-muted-foreground lg:hidden">View Document</span>
                       </button>
                     </div>
                     <div className="text-sm text-muted-foreground">{cert.issuer} • {cert.date}</div>
@@ -851,7 +853,7 @@ export default function Home() {
 
 
         <section id="connect" ref={(el) => { sectionsRef.current[4] = el }} className="py-32 opacity-0">
-          <div className="grid lg:grid-cols-2 gap-16">
+          <div className="grid lg:grid-cols-2 gap-16 text-center lg:text-left">
             <div className="space-y-8">
               <h2 className="text-4xl font-light">Let's Connect</h2>
 
@@ -863,7 +865,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <Link
                     href="mailto:harshmehta1591@gmail.com"
-                    className="group flex items-center gap-3 text-foreground hover:text-muted-foreground transition-colors duration-300"
+                    className="group flex items-center gap-3 text-foreground hover:text-muted-foreground transition-colors duration-300 w-fit mx-auto lg:mx-0"
                   >
                     <span className="text-lg">harshmehta1591@gmail.com</span>
                     <svg
@@ -879,7 +881,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-8 text-center lg:text-left">
               <div className="text-sm text-muted-foreground font-mono">ELSEWHERE</div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -900,7 +902,14 @@ export default function Home() {
                   >
                     <div className="space-y-2">
                       <div className="text-foreground group-hover:text-muted-foreground transition-colors duration-300">
-                        {social.name}
+                        {social.name === "X (formerly Twitter)" ? (
+                          <>
+                            <span className="lg:hidden">X (Twitter)</span>
+                            <span className="hidden lg:inline">X (formerly Twitter)</span>
+                          </>
+                        ) : (
+                          social.name
+                        )}
                       </div>
                       <div className="text-sm text-muted-foreground">{social.handle}</div>
                     </div>
@@ -911,10 +920,10 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="py-16 border-t border-border">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+        <footer className="py-8 lg:py-16 border-t border-border">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-8 text-center lg:text-left">
             <div className="space-y-2">
-              <div className="text-sm text-muted-foreground">© 2025 Harsh Mehta. All rights reserved.</div>
+              <div className="text-sm ">© 2025 Harsh Mehta. All rights reserved.</div>
             </div>
 
 
@@ -922,7 +931,7 @@ export default function Home() {
         </footer>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
+      <div className="fixed bottom-0 left-0 right-0 h-12 lg:h-24 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
     </div>
   )
 }
