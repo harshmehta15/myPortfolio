@@ -321,31 +321,32 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-8 lg:px-1 pt-0">
+      <main className="max-w-4xl mx-auto px-8 lg:px-0 pt-0">
         <header
           id="intro"
           ref={(el) => { sectionsRef.current[0] = el }}
           className="min-h-screen flex items-center opacity-0 scroll-mt-24"
         >
-          <div className="grid lg:grid-cols-5 gap-16 w-full">
-            <div className="lg:col-span-3 space-y-8">
+          <div className="w-full">
+            {/* Mobile layout - full width */}
+            <div className="lg:hidden space-y-8 text-center">
               <div className="space-y-2">
                 <div className="text-sm text-muted-foreground font-mono tracking-wider">PORTFOLIO / 2025</div>
-                <h1 className="text-6xl lg:text-7xl font-light tracking-tight">
+                <h1 className="text-6xl font-light tracking-tight">
                   Harsh
                   <br />
                   <span className="text-muted-foreground">Mehta</span>
                 </h1>
               </div>
 
-              <div className="space-y-6 max-w-md">
+              <div className="space-y-6">
                 <p className="text-xl text-muted-foreground leading-relaxed">
                   Software Engineer helping <span className="text-foreground">Change Poor Perception</span> of
                   <span className="text-foreground"> Public toilets</span> in India,
                   <span className="text-foreground"> One toilet at a Time</span>.
                 </p>
 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     Available for work
@@ -353,12 +354,12 @@ export default function Home() {
                   <div>Based in India</div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
                   <a
                     href="https://docs.google.com/document/d/1SRGcODzKLN8_fbaXtBcRrmjV78lLNzeVoo8_v8gPkKc/edit?usp=sharing"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center justify-center gap-2"
                   >
                     <svg
                       className="w-4 h-4"
@@ -379,7 +380,7 @@ export default function Home() {
                     href="https://github.com/harshmehta15"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center justify-center gap-2"
                     aria-label="Open GitHub profile"
                   >
                     <svg
@@ -399,7 +400,7 @@ export default function Home() {
                     href="https://www.linkedin.com/in/harshmehta15"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center justify-center gap-2"
                     aria-label="Open LinkedIn profile"
                   >
                     <svg
@@ -416,7 +417,7 @@ export default function Home() {
                     href="https://leetcode.com/u/19it056/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                    className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center justify-center gap-2"
                     aria-label="Open LeetCode profile"
                   >
                     <svg
@@ -435,39 +436,186 @@ export default function Home() {
                     LeetCode
                   </a>
                 </div>
+
+                {/* CURRENTLY section for mobile */}
+                <div className="space-y-4 text-center border border-border rounded-lg p-6">
+                  <div className="text-sm text-muted-foreground font-mono">CURRENTLY</div>
+                  <div className="space-y-2">
+                    <div className="text-foreground">Software Development Engineer</div>
+                    <div className="text-muted-foreground">@ <a href="https://www.loocafe.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:no-underline">Loocafe , India</a></div>
+                    <div className="text-xs text-muted-foreground">2023 — Present</div>
+                    <button
+                      onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="mt-2 px-3 py-2 text-xs border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
+                    >
+                      View Experience
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* FOCUS section for mobile - hidden */}
+                <div className="space-y-4 text-center hidden">
+                  <div className="text-sm text-muted-foreground font-mono">FOCUS</div>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {["Flutter", "React", "Next.js", "Firebase", "Supabase", "GCP"].map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-3 py-1 text-xs border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="lg:col-span-2 flex flex-col justify-end space-y-8">
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground font-mono">CURRENTLY</div>
+            {/* Desktop layout - original grid */}
+            <div className="hidden lg:grid lg:grid-cols-5 gap-24 w-full">
+              <div className="lg:col-span-3 space-y-8 text-left">
                 <div className="space-y-2">
-                  <div className="text-foreground">Software Development Engineer</div>
-                  <div className="text-muted-foreground">@ <a href="https://www.loocafe.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:no-underline">Loocafe , India</a></div>
-                  <div className="text-xs text-muted-foreground">2023 — Present</div>
-                  <button
-                    onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="mt-2 px-3 py-2 text-xs border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
-                  >
-                    View Experience
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                  <div className="text-sm text-muted-foreground font-mono tracking-wider">PORTFOLIO / 2025</div>
+                  <h1 className="text-7xl font-light tracking-tight">
+                    Harsh
+                    <br />
+                    <span className="text-muted-foreground">Mehta</span>
+                  </h1>
+                </div>
+
+                <div className="space-y-6 max-w-md">
+                  <p className="text-xl text-muted-foreground leading-relaxed">
+                    Software Engineer helping <span className="text-foreground">Change Poor Perception</span> of
+                    <span className="text-foreground"> Public toilets</span> in India,
+                    <span className="text-foreground"> One toilet at a Time</span>.
+                  </p>
+
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      Available for work
+                    </div>
+                    <div>Based in India</div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <a
+                      href="https://docs.google.com/document/d/1SRGcODzKLN8_fbaXtBcRrmjV78lLNzeVoo8_v8gPkKc/edit?usp=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      Resume
+                    </a>
+                    <a
+                      href="https://github.com/harshmehta15"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                      aria-label="Open GitHub profile"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      GitHub
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/in/harshmehta15"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                      aria-label="Open LinkedIn profile"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M4.983 3.5C4.983 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.483 1.12 2.483 2.5zM.3 8.25h4.4V23H.3V8.25zM8.6 8.25h4.215v2.01h.06c.587-1.113 2.02-2.285 4.158-2.285 4.448 0 5.267 2.928 5.267 6.733V23h-4.4v-6.53c0-1.558-.028-3.56-2.17-3.56-2.172 0-2.505 1.697-2.505 3.45V23H8.6V8.25z" />
+                      </svg>
+                      LinkedIn
+                    </a>
+                    <a
+                      href="https://leetcode.com/u/19it056/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
+                      aria-label="Open LeetCode profile"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      LeetCode
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground font-mono">FOCUS</div>
-                <div className="flex flex-wrap gap-2">
-                  {["Flutter", "React", "Next.js", "Firebase", "Supabase", "GCP"].map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-3 py-1 text-xs border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
+              <div className="lg:col-span-2 flex flex-col justify-end space-y-8">
+                <div className="space-y-4 text-left">
+                  <div className="text-sm text-muted-foreground font-mono">CURRENTLY</div>
+                  <div className="space-y-2">
+                    <div className="text-foreground">Software Development Engineer</div>
+                    <div className="text-muted-foreground">@ <a href="https://www.loocafe.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:no-underline">Loocafe , India</a></div>
+                    <div className="text-xs text-muted-foreground">2023 — Present</div>
+                    <button
+                      onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="mt-2 px-3 py-2 text-xs border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 inline-flex items-center gap-2"
                     >
-                      {skill}
-                    </span>
-                  ))}
+                      View Experience
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="text-sm text-muted-foreground font-mono">FOCUS</div>
+                  <div className="flex flex-wrap gap-2">
+                    {["Flutter", "React", "Next.js", "Firebase", "Supabase", "GCP"].map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-3 py-1 text-xs border border-border rounded-full hover:border-muted-foreground/50 transition-colors duration-300"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
