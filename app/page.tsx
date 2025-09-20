@@ -321,7 +321,12 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-8 lg:px-0 pt-0">
+      <main 
+        className="max-w-4xl mx-auto px-8 lg:px-0 pt-16 sm:pt-14 md:pt-12 lg:pt-0" 
+        style={{ 
+          paddingTop: 'calc(env(safe-area-inset-top) + 3rem)'
+        }}
+      >
         <header
           id="intro"
           ref={(el) => { sectionsRef.current[0] = el }}
