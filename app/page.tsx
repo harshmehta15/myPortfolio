@@ -117,9 +117,10 @@ export default function Home() {
         aria-label="Primary"
         className="fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur border-b border-border"
       >
-        <div className="max-w-4xl mx-auto px-8 lg:px-16">
-          <div className="flex items-center justify-between py-3">
-            <div className="text-sm text-muted-foreground font-mono tracking-wider">Harsh Mehta's Portfoli0</div>
+        <div className="relative">
+          <div className="max-w-4xl mx-auto px-8 lg:px-16">
+            <div className="flex items-center justify-between py-3">
+              <div className="text-sm text-muted-foreground font-mono tracking-wider">Harsh Mehta's Portfoli0</div>
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-6">
@@ -181,141 +182,112 @@ export default function Home() {
               className="lg:hidden p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200"
               aria-label="Toggle mobile menu"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                {isMobileMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
+              <span className="relative block h-6 w-6 cursor-pointer">
+                {/* Regular hamburger lines */}
+                <span className="absolute right-0 block h-full w-full">
+                  <span
+                    className={`relative left-0 top-0 my-1 block h-0.5 rounded-sm bg-foreground delay-0 duration-200 ease-in-out ${
+                      !isMobileMenuOpen ? "!w-full delay-300" : "w-0"
+                    }`}
+                  ></span>
+                  <span
+                    className={`relative left-0 top-0 my-1 block h-0.5 rounded-sm bg-foreground delay-150 duration-200 ease-in-out ${
+                      !isMobileMenuOpen ? "delay-400 !w-full" : "w-0"
+                    }`}
+                  ></span>
+                  <span
+                    className={`relative left-0 top-0 my-1 block h-0.5 rounded-sm bg-foreground delay-200 duration-200 ease-in-out ${
+                      !isMobileMenuOpen ? "!w-full delay-500" : "w-0"
+                    }`}
+                  ></span>
+                </span>
+                {/* X (close) icon */}
+                <span className="block absolute right-0 h-full w-full rotate-45">
+                  <span
+                    className={`absolute left-3 top-0 block h-full w-0.5 rounded-sm bg-foreground delay-300 duration-200 ease-in-out ${
+                      !isMobileMenuOpen ? "!h-0 delay-0" : "h-full"
+                    }`}
+                  ></span>
+                  <span
+                    className={`delay-400 absolute left-0 top-3 block h-0.5 w-full rounded-sm bg-foreground duration-200 ease-in-out ${
+                      !isMobileMenuOpen ? "!h-0 delay-200" : "h-0.5"
+                    }`}
+                  ></span>
+                </span>
+              </span>
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile Side Menu */}
-      <div
-        className={`fixed inset-0 z-50 lg:hidden ${
-          isMobileMenuOpen ? 'block' : 'hidden'
-        }`}
-      >
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-          onClick={closeMobileMenu}
-        />
-        
-        {/* Side Menu */}
-        <div
-          className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-background border-l border-border transform transition-transform duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        >
-          <div className="flex flex-col h-full">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-border">
-              <h2 className="text-lg font-medium">Menu</h2>
-              <button
-                onClick={closeMobileMenu}
-                className="p-2 rounded-lg hover:bg-muted-foreground/10 transition-colors duration-200"
-                aria-label="Close mobile menu"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
             </div>
-
-            {/* Navigation Items */}
-            <nav className="flex-1 p-6">
-              <ul className="space-y-4">
-                {[
-                  { label: "Home", id: "intro" },
-                  { label: "Experience", id: "work" },
-                  { label: "Projects", id: "projects" },
-                  { label: "Education", id: "education" },
-                  { label: "Contact", id: "connect" },
-                ].map((item) => (
-                  <li key={item.id}>
-                    <button
-                      onClick={() => {
-                        document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })
-                        closeMobileMenu()
-                      }}
-                      className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                        activeSection === item.id
-                          ? "bg-muted-foreground/20 text-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10"
-                      }`}
-                      aria-current={activeSection === item.id ? "page" : undefined}
-                    >
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              
-              {/* Mobile Theme Toggle */}
-              {mounted && (
-                <div className="mt-6 pt-6 border-t border-border">
-                  <button
-                    onClick={() => {
-                      if (theme === "system") {
-                        // If system is dark, switch to light; if system is light, switch to dark
-                        const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-                        setTheme(systemIsDark ? "light" : "dark")
-                      } else if (theme === "light") {
-                        setTheme("dark")
-                      } else {
-                        setTheme("light")
-                      }
-                    }}
-                    className="w-full text-left p-3 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 flex items-center gap-3"
-                  >
-                    {theme === "dark" ? (
-                      <>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        Light Mode
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                        Dark Mode
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </nav>
+          
+          {/* Compact Mobile Navigation Menu */}
+          <div
+            className={`lg:hidden absolute left-0 right-0 top-full w-full bg-background border-b border-border shadow-lg transition-all duration-300 ease-in-out z-30 ${
+              isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+            }`}
+          >
+        <nav className="max-w-4xl mx-auto px-8">
+          <ul className="flex flex-col py-4">
+            {[
+              { label: "Home", id: "intro" },
+              { label: "Experience", id: "work" },
+              { label: "Projects", id: "projects" },
+              { label: "Education", id: "education" },
+              { label: "Contact", id: "connect" },
+            ].map((item) => (
+              <li key={item.id}>
+                <button
+                  onClick={() => {
+                    document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })
+                    closeMobileMenu()
+                  }}
+                  className={`w-full text-left py-3 px-4 rounded-lg transition-all duration-200 hover:bg-muted-foreground/10 ${
+                    activeSection === item.id
+                      ? "text-foreground bg-muted-foreground/20"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  aria-current={activeSection === item.id ? "page" : undefined}
+                >
+                  {item.label}
+                </button>
+              </li>
+            ))}
+            
+            {/* Mobile Theme Toggle */}
+            {mounted && (
+              <li className="pt-2 mt-2 border-t border-border">
+                <button
+                  onClick={() => {
+                    if (theme === "system") {
+                      const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+                      setTheme(systemIsDark ? "light" : "dark")
+                    } else if (theme === "light") {
+                      setTheme("dark")
+                    } else {
+                      setTheme("light")
+                    }
+                  }}
+                  className="w-full text-left py-3 px-4 rounded-lg transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted-foreground/10 flex items-center gap-3"
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                      </svg>
+                      Dark Mode
+                    </>
+                  )}
+                </button>
+              </li>
+            )}
+          </ul>
+        </nav>
           </div>
         </div>
       </div>
