@@ -391,7 +391,7 @@ export default function Home() {
                     LinkedIn
                   </a>
                   <a
-                    href="https://leetcode.com/u/19it056/"
+                    href="https://leetcode.com/u/harshm15/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center justify-center gap-2"
@@ -537,7 +537,7 @@ export default function Home() {
                       LinkedIn
                     </a>
                     <a
-                      href="https://leetcode.com/u/19it056/"
+                      href="https://leetcode.com/u/harshm15/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
@@ -1031,7 +1031,7 @@ export default function Home() {
                   { name: "GitHub", handle: "@harshmehta15", url: "https://github.com/harshmehta15" },
                   { name: "X (formerly Twitter)", handle: "@harshmofficial", url: "https://x.com/harshmofficial" },
                   { name: "LinkedIn", handle: "@harshmehta15", url: "https://www.linkedin.com/in/harshmehta15" },
-                  { name: "LeetCode", handle: "@19it056", url: "https://leetcode.com/u/19it056/" },
+                  { name: "LeetCode", handle: "@harshm15", url: "https://leetcode.com/u/harshm15/" },
                   { name: "Discord", handle: "@harsh.mehta", url: "https://discord.com/users/harsh.mehta" },
                   { name: "Telegram", handle: "@harshmehta15", url: "https://t.me/harshmehta15" },
                 ].map((social) => (
