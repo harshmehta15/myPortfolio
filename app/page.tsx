@@ -333,9 +333,8 @@ export default function Home() {
 
                 <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
                   <a
-                    href="https://docs.google.com/document/d/1SRGcODzKLN8_fbaXtBcRrmjV78lLNzeVoo8_v8gPkKc/edit?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/Harsh's%20Resume.pdf"
+                    download="Harsh's Resume.pdf"
                     className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center justify-center gap-2"
                   >
                     <svg
@@ -479,9 +478,8 @@ export default function Home() {
 
                   <div className="flex items-center gap-4">
                     <a
-                      href="https://docs.google.com/document/d/1SRGcODzKLN8_fbaXtBcRrmjV78lLNzeVoo8_v8gPkKc/edit?usp=sharing"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="/Harsh's%20Resume.pdf"
+                      download="Harsh's Resume.pdf"
                       className="px-4 py-2 text-sm border border-border rounded-lg hover:border-muted-foreground/50 transition-colors duration-300 flex items-center gap-2"
                     >
                       <svg
